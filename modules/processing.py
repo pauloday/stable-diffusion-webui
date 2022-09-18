@@ -102,7 +102,7 @@ class Processed:
             "prompt": self.prompt if type(self.prompt) != list else self.prompt[0],
             "negative_prompt": self.negative_prompt if type(self.negative_prompt) != list else self.negative_prompt[0],
             "seed": int(self.seed if type(self.seed) != list else self.seed[0]),
-            "subseed": int(self.subseed if type(self.subseed) != list else self.subseed[0]),
+            "subseed": int(self.subseed if type(self.subseed) != list else self.subseed[0]) if self.subseed is not None else -1,
             "subseed_strength": self.subseed_strength,
             "width": self.width,
             "height": self.height,
@@ -117,7 +117,12 @@ class Processed:
 def slerp(val, low, high):
     low_norm = low/torch.norm(low, dim=1, keepdim=True)
     high_norm = high/torch.norm(high, dim=1, keepdim=True)
-    omega = torch.acos((low_norm*high_norm).sum(1))
+    dot = (low_norm*high_norm).sum(1)
+
+    if dot.mean() > 0.9995:
+        return low * val + high * (1 - val)
+
+    omega = torch.acos(dot)
     so = torch.sin(omega)
     res = (torch.sin((1.0-val)*omega)/so).unsqueeze(1)*low + (torch.sin(val*omega)/so).unsqueeze(1) * high
     return res
