@@ -179,7 +179,7 @@ class StableDiffusionModelHijack:
     comments = []
     dir_mtime = None
     layers = None
-    circular_enabled = False
+    padding_mode = False
 
     def load_textual_inversion_embeddings(self, dirname, model):
         mt = os.path.getmtime(dirname)
@@ -259,14 +259,14 @@ class StableDiffusionModelHijack:
 
         self.layers = flatten(m)
 
-    def apply_circular(self, enable):
-        if self.circular_enabled == enable:
+    def apply_padding(self, mode):
+        if self.padding_mode == mode:
             return
 
-        self.circular_enabled = enable
+        self.padding_mode = mode
 
         for layer in [layer for layer in self.layers if type(layer) == torch.nn.Conv2d]:
-            layer.padding_mode = 'circular' if enable else 'zeros'
+            layer.padding_mode = mode
 
 
 class FrozenCLIPEmbedderWithCustomWords(torch.nn.Module):
@@ -404,15 +404,5 @@ class EmbeddingsWithFixes(torch.nn.Module):
                     tensor[offset:offset+emb_len] = self.embeddings.word_embeddings[word][0:emb_len]
 
         return inputs_embeds
-
-
-def add_circular_option_to_conv_2d():
-    conv2d_constructor = torch.nn.Conv2d.__init__
-
-    def conv2d_constructor_circular(self, *args, **kwargs):
-        return conv2d_constructor(self, *args, padding_mode='circular', **kwargs)
-
-    torch.nn.Conv2d.__init__ = conv2d_constructor_circular
-
 
 model_hijack = StableDiffusionModelHijack()
