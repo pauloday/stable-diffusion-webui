@@ -407,7 +407,7 @@ def create_ui(txt2img, img2img, run_extras, run_pnginfo):
 
                 with gr.Row():
                     restore_faces = gr.Checkbox(label='Restore faces', value=False, visible=len(shared.face_restorers) > 1)
-                    tiling = gr.Checkbox(label='Tiling', value=False)
+                    padding = gr.Dropdown(label='Tiling', choices=['zeros', 'reflect', 'replicate', 'circular'])
 
                 with gr.Row():
                     batch_count = gr.Slider(minimum=1, maximum=cmd_opts.max_batch_count, step=1, label='Batch count', value=1)
@@ -459,7 +459,7 @@ def create_ui(txt2img, img2img, run_extras, run_pnginfo):
                     steps,
                     sampler_index,
                     restore_faces,
-                    tiling,
+                    padding,
                     batch_count,
                     batch_size,
                     cfg_scale,
@@ -537,7 +537,7 @@ def create_ui(txt2img, img2img, run_extras, run_pnginfo):
 
                 with gr.Row():
                     restore_faces = gr.Checkbox(label='Restore faces', value=False, visible=len(shared.face_restorers) > 1)
-                    tiling = gr.Checkbox(label='Tiling', value=False)
+                    padding = gr.Dropdown(label='Tiling', choices=['zeros', 'reflect', 'replicate', 'circular'])
                     sd_upscale_overlap = gr.Slider(minimum=0, maximum=256, step=16, label='Tile overlap', value=64, visible=False)
 
                 with gr.Row():
@@ -656,7 +656,7 @@ def create_ui(txt2img, img2img, run_extras, run_pnginfo):
                     mask_blur,
                     inpainting_fill,
                     restore_faces,
-                    tiling,
+                    padding,
                     switch_mode,
                     batch_count,
                     batch_size,
